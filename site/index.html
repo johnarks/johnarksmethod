@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>JohnArks Method — Setup Prompt</title>
+<meta name="description" content="One copy-paste prompt that sets up the JohnArks Method in any project.">
+<style>
+  :root { color-scheme: light; }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    background: #fafafa; color: #1a1a1a; line-height: 1.6;
+  }
+  .wrap { max-width: 760px; margin: 0 auto; padding: 48px 20px 64px; }
+  h1 { font-size: 1.9rem; margin: 0 0 8px; letter-spacing: -0.01em; }
+  .sub { color: #555; margin: 0 0 32px; font-size: 1.05rem; }
+  .card {
+    background: #fff; border: 1px solid #e5e5e5; border-radius: 12px;
+    padding: 24px; margin-bottom: 32px; box-shadow: 0 1px 3px rgba(0,0,0,.04);
+  }
+  .card h2 { font-size: 1.1rem; margin: 0 0 12px; }
+  .prompt {
+    position: relative; background: #0f172a; color: #e2e8f0; border-radius: 8px;
+    padding: 20px; font-size: 0.98rem; white-space: pre-wrap; word-wrap: break-word;
+  }
+  .copy-btn {
+    margin-top: 14px; display: inline-block; cursor: pointer;
+    background: #1a1a1a; color: #fff; border: 0; border-radius: 8px;
+    padding: 10px 22px; font-size: 0.95rem; font-weight: 600;
+  }
+  .copy-btn:hover { background: #333; }
+  .copy-btn.done { background: #15803d; }
+  .secondary .prompt { background: #f1f5f9; color: #1e293b; }
+  .secondary .copy-btn { background: #475569; }
+  .secondary .copy-btn:hover { background: #334155; }
+  ul.steps { padding-left: 22px; margin: 12px 0 0; }
+  ul.steps li { margin-bottom: 8px; }
+  .repo-link { display: inline-block; margin-top: 8px; color: #0366d6; text-decoration: none; font-weight: 600; }
+  .repo-link:hover { text-decoration: underline; }
+  footer { margin-top: 40px; color: #888; font-size: 0.85rem; }
+  code.inline { background: #eef; padding: 1px 6px; border-radius: 4px; font-size: 0.9em; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>JohnArks Method</h1>
+  <p class="sub">A build method for people who can't review code: an AI agent builds in small checkpoints with five enforced quality gates, and every "done" is proven by git commits plus executable verification.</p>
+
+  <div class="card">
+    <h2>Setup prompt — copy and paste into your AI agent</h2>
+    <div class="prompt" id="setup-prompt">Set up the JohnArks Method in this project using https://github.com/johnarks/johnarksmethod. Install all skills and supporting files, wire up the quality gates, and confirm everything is working — if anything is already installed, confirm that instead of reinstalling it. If this folder is not a git repository yet, stop and ask me to create one before continuing. When setup is confirmed, ask me what I'd like to do.</div>
+    <button class="copy-btn" data-copy="setup-prompt" data-done="Copied!">Copy setup prompt</button>
+    <br>
+    <a class="repo-link" href="https://github.com/johnarks/johnarksmethod">github.com/johnarks/johnarksmethod</a>
+  </div>
+
+  <div class="card">
+    <h2>What happens next</h2>
+    <ul class="steps">
+      <li>The agent installs the 7 skills, the <code class="inline">jam.py</code> enforcer, and the stop hook — confirming what's already there instead of duplicating it.</li>
+      <li>It makes sure the folder is a git repository, asking you before creating one (and offering to set up a GitHub repo).</li>
+      <li>It verifies everything works.</li>
+      <li>Then it asks <strong>"What would you like to do?"</strong> — your answer starts discovery.</li>
+    </ul>
+  </div>
+
+  <div class="card secondary">
+    <h2>Resume — new session, new platform, new model</h2>
+    <div class="prompt" id="resume-prompt">Resume the JohnArks Method in this project. Run python3 .jam/bin/jam.py resume, fix any findings it reports, then continue the build loop from the current checkpoint. Do not re-run discovery or re-ask settled questions.</div>
+    <button class="copy-btn" data-copy="resume-prompt" data-done="Copied!">Copy resume prompt</button>
+  </div>
+
+  <footer>JohnArks Method · MIT licensed · v1.0</footer>
+</div>
+<script>
+  document.querySelectorAll('[data-copy]').forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      var text = document.getElementById(btn.getAttribute('data-copy')).textContent;
+      var done = function () {
+        var orig = btn.textContent;
+        btn.textContent = btn.getAttribute('data-done');
+        btn.classList.add('done');
+        setTimeout(function () { btn.textContent = orig; btn.classList.remove('done'); }, 1800);
+      };
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(text).then(done).catch(function () { fallback(); });
+      } else { fallback(); }
+      function fallback() {
+        var ta = document.createElement('textarea');
+        ta.value = text; document.body.appendChild(ta); ta.select();
+        try { document.execCommand('copy'); done(); } catch (e) {}
+        document.body.removeChild(ta);
+      }
+    });
+  });
+</script>
+</body>
+</html>
