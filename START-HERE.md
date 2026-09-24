@@ -42,6 +42,28 @@ what changed, and run python3 .jam/bin/jam.py check to verify the project
 state is still clean.
 ```
 
+## Give feedback, add features, or change direction mid-build
+
+Open the project folder and paste — then describe what you want different:
+
+```text
+I'm using the JohnArks Method in this project. I have feedback / new
+features / a direction change:
+
+<describe what you saw, what you want different, or the new direction>
+
+Pause the build loop. Ask me focused questions about anything unclear,
+then update the product requirements, checkpoint plan, and decision log
+to reflect this. Show me the revised plan for approval before continuing.
+```
+
+**What happens.** The agent stops the loop instead of building on stale
+intent, asks focused questions about just the change (never full
+re-discovery), updates the requirement IDs and the decision log with the
+reason, marks replaced checkpoints superseded, and presents a revised
+checkpoint sequence for your approval. Nothing already built is lost —
+the record keeps what came before and why it turned.
+
 ## What you'll be asked to do, ever
 
 1. **Describe what you want**, in ordinary language.
