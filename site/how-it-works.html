@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>JohnArks Method — How it works</title>
+<meta name="description" content="What the JohnArks Method is, what each part does, and which problems each part solves.">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="wrap">
+  <nav class="topnav"><a href="index.html">Setup</a><a href="how-it-works.html" class="active">How it works</a><a href="https://github.com/johnarks/johnarksmethod">GitHub</a></nav>
+
+  <h1>How it works</h1>
+  <p class="sub">The JohnArks Method is a build method for people who can't review code. You describe what you want in ordinary language; an AI agent builds it in small checkpoints. Every checkpoint passes five enforced quality gates, and every "done" is proven by a git commit plus a passing verification command — never by the agent's word.</p>
+
+  <h2 class="guide-h2">The problems it solves</h2>
+  <p class="guide-lede">Each problem below is answered by a specific mechanism. Nothing here runs on trust.</p>
+
+  <div class="problem-grid">
+    <div class="problem">
+      <h3>"The agent said done. It wasn't."</h3>
+      <p>AI agents hallucinate — confidently describing work they never did, tests they never ran, bugs they never fixed.</p>
+      <span class="fix">→ Done requires a real git commit, a verify command that exited 0, and an independent auditor that re-derives the outcome from the repo alone. A claim without evidence fails mechanically.</span>
+    </div>
+    <div class="problem">
+      <h3>"I can't review code."</h3>
+      <p>"Does this look right?" is not a question a non-developer can answer about code — so code review can't be your safety net.</p>
+      <span class="fix">→ You review the <em>thing</em>, not the code: touchable builds early, a vision-based UI reviewer comparing screenshots to the design, and a human gate presented in plain language.</span>
+    </div>
+    <div class="problem">
+      <h3>"The session died / I switched tools."</h3>
+      <p>Sessions run out of tokens. You move from Claude Code to Codex to whatever comes next — and all context evaporates.</p>
+      <span class="fix">→ Everything lives in the project's <code class="inline">.jam/</code> directory and in git: product intent, plan, checkpoint state, decisions. One resume command picks up exactly where you left off, on any platform.</span>
+    </div>
+    <div class="problem">
+      <h3>"I changed my mind mid-build."</h3>
+      <p>You see a working build and realize you want something different. Most workflows either plow ahead or collapse.</p>
+      <span class="fix">→ Redirect is a first-class event: the loop stops, the agent asks focused questions about just the change, requirements and the decision log are updated, replaced checkpoints are marked superseded, and you approve the revised plan.</span>
+    </div>
+    <div class="problem">
+      <h3>"Nobody remembers why we built it this way."</h3>
+      <p>Months later, nobody knows which requirements drove which decisions — or which alternatives were rejected and why.</p>
+      <span class="fix">→ Product intent with stable requirement IDs, a decision log with reasons and rejected alternatives, and every checkpoint tracing to the requirements it satisfies.</span>
+    </div>
+    <div class="problem">
+      <h3>"The agent wrote the record too."</h3>
+      <p>If the same agent that did the work also writes the report, the report is just another claim.</p>
+      <span class="fix">→ A scribe records outcomes; a separate auditor with no access to the scribe's notes reconstructs them from git, files, and test evidence. Mismatch blocks progress.</span>
+    </div>
+  </div>
+
+  <h2 class="guide-h2">How a build runs</h2>
+  <ol class="loop">
+    <li><strong>Discovery.</strong> The agent asks "What would you like to do?" — one focused question at a time. It writes requirements (FR-### / QR-###) and presents one product-intent summary. You confirm or correct it. Nothing is planned until you accept the summary.</li>
+    <li><strong>Planning.</strong> The work is split into small ordered checkpoints, each tracing to requirements and declaring its verify command. The plan front-loads something <strong>touchable</strong> — checkpoint 1 or 2 produces something you can open, click, and react to. You approve the sequence.</li>
+    <li><strong>Gated build loop.</strong> Each checkpoint runs: tests written first (they must fail), implementation, tests green — then the five gates below. A checkpoint is done only when all gates pass and the evidence is committed.</li>
+    <li><strong>Final review.</strong> A drift check diffs what was built against the product intent. You test as a user. Feedback becomes new checkpoints through the same loop.</li>
+    <li><strong>Redirect (any time).</strong> New idea, new feature, new direction? The loop stops, the delta is questioned and recorded, the plan is revised with your approval, and the loop resumes. Nothing built is lost.</li>
+  </ol>
+
+  <h2 class="guide-h2">The five gates</h2>
+  <p class="guide-lede">Every checkpoint passes through all five. The only allowed skip is the UI gate on purely logic-only checkpoints, with a recorded reason.</p>
+  <div class="gate"><h3>Gate 1 — Behavior</h3><p>The checkpoint's declared verify command runs. Exit 0 means the behavior is proven, with the test report archived as evidence. Not "the agent says it works."</p></div>
+  <div class="gate"><h3>Gate 2 — UI review</h3><p>A vision-based reviewer compares the implementation against the design reference in matching states, listing every difference with severity and location. Zero blockers to pass.</p></div>
+  <div class="gate"><h3>Gate 3 — Dual adversarial review</h3><p>Two independent, context-isolated reviewers examine the code against the architecture doc. Both must approve. The builder fixes every finding and re-runs affected tests.</p></div>
+  <div class="gate"><h3>Gate 4 — Human review</h3><p>You see what was built, the test results, and the reviewer verdicts — in plain language. Your approval, your feedback, your call.</p></div>
+  <div class="gate"><h3>Gate 5 — Independent audit</h3><p>A scribe records the outcome; a separate auditor reconstructs it from git, files, and test evidence without seeing the scribe's notes. If they disagree, progress blocks until the record and reality match.</p></div>
+
+  <h2 class="guide-h2">The trust chain</h2>
+  <p class="guide-lede">Every layer catches the layer above it. Any single liar is caught by the next.</p>
+  <div class="chain">
+    <div class="step">Worker (the building agent) <span class="arrow">→ caught by</span></div>
+    <div class="step">Two adversarial reviewers <span class="arrow">→ caught by</span></div>
+    <div class="step">You (human review) <span class="arrow">→ recorded by</span></div>
+    <div class="step">Scribe <span class="arrow">→ checked by</span></div>
+    <div class="step">Independent auditor <span class="arrow">→ enforced by</span></div>
+    <div class="step"><code class="inline">jam.py</code> enforcer <span class="arrow">→ grounded in</span></div>
+    <div class="step">Git — the durable ground truth</div>
+  </div>
+
+  <h2 class="guide-h2">The pieces</h2>
+  <p class="guide-lede">Seven skills, one enforcer, one hook, one installer. You only ever invoke one skill — the orchestrator runs the rest.</p>
+  <table class="skill-table">
+    <tr><th>Piece</th><th>What it does</th></tr>
+    <tr><td><code>orchestrator</code></td><td>Runs the entire loop: discovery, planning, gated checkpoints, final review, redirect. The only skill you ever call on directly.</td></tr>
+    <tr><td><code>checkpoint-planner</code></td><td>Splits work into small ordered checkpoints, each tracing to requirement IDs with a declared verify command.</td></tr>
+    <tr><td><code>test-planner</code></td><td>Defines "proven": behavior test cases from your perspective, edges included, failing before the feature exists.</td></tr>
+    <tr><td><code>prototype-builder</code></td><td>Builds a clickable HTML prototype as the visual reference when no design exists yet.</td></tr>
+    <tr><td><code>ui-reviewer</code></td><td>Vision-based comparison of implementation vs. reference in matching states. Zero blockers to pass.</td></tr>
+    <tr><td><code>adversarial-review</code></td><td>Two isolated reviewers vs. the architecture doc. Both must approve.</td></tr>
+    <tr><td><code>design-planner</code></td><td>Writes the opinionated architecture/design doc the reviewers enforce.</td></tr>
+    <tr><td><code>jam.py</code></td><td>The enforcer (stdlib Python, no dependencies). <code>check</code> validates state and evidence commits · <code>resume</code> prints the recovery brief · <code>verify</code> runs a checkpoint's verify command · <code>gates</code> reports open gates.</td></tr>
+    <tr><td>Stop hook</td><td>Claude Code runs it on Stop: if the enforcer reports findings or gates are open, stopping is blocked until they're fixed. (Codex has no hook equivalent — the orchestrator runs the enforcer before every turn instead.)</td></tr>
+    <tr><td><code>install.sh</code></td><td>Idempotent installer: skills, enforcer, hook, routing block. Refuses to proceed on a non-git folder without your explicit decision.</td></tr>
+  </table>
+
+  <h2 class="guide-h2">The three prompts</h2>
+  <div class="card">
+    <h2>Setup — new project</h2>
+    <div class="prompt" id="p-setup">Set up the JohnArks Method in this project using https://github.com/johnarks/johnarksmethod. Install all skills and supporting files, wire up the quality gates, and confirm everything is working — if anything is already installed, confirm that instead of reinstalling it. If this folder is not a git repository yet, stop and ask me to create one before continuing. When setup is confirmed, ask me what I'd like to do.</div>
+    <button class="copy-btn" data-copy="p-setup" data-done="Copied!">Copy</button>
+  </div>
+  <div class="card secondary">
+    <h2>Resume — new session, platform, or model</h2>
+    <div class="prompt" id="p-resume">Resume the JohnArks Method in this project. Run python3 .jam/bin/jam.py resume, fix any findings it reports, then continue the build loop from the current checkpoint. Do not re-run discovery or re-ask settled questions.</div>
+    <button class="copy-btn" data-copy="p-resume" data-done="Copied!">Copy</button>
+  </div>
+  <div class="card secondary">
+    <h2>Feedback / redirect — change your mind any time</h2>
+    <div class="prompt" id="p-feedback">I'm using the JohnArks Method in this project. I have feedback / new features / a direction change:
+
+&lt;describe what you saw, what you want different, or the new direction&gt;
+
+Pause the build loop. Ask me focused questions about anything unclear, then update the product requirements, checkpoint plan, and decision log to reflect this. Show me the revised plan for approval before continuing.</div>
+    <button class="copy-btn" data-copy="p-feedback" data-done="Copied!">Copy</button>
+  </div>
+
+  <h2 class="guide-h2">Who it's for</h2>
+  <p class="guide-lede"><strong>For:</strong> non-developers directing AI-built software; long-lived projects where sessions die and context must survive; people who switch between Claude Code, Codex, and future models; anyone burned by an agent that said "done" and wasn't.</p>
+  <p class="guide-lede"><strong>Not for:</strong> trivial edits and one-off questions; teams with rigorous human code review on every change; anyone who wants the agent to "just do it" with no checkpoints — the method will fight you, by design.</p>
+
+  <footer>JohnArks Method · <a class="repo-link" href="https://github.com/johnarks/johnarksmethod">github.com/johnarks/johnarksmethod</a> · MIT licensed · v1.0</footer>
+</div>
+<script>
+  document.querySelectorAll('[data-copy]').forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      var text = document.getElementById(btn.getAttribute('data-copy')).textContent;
+      var done = function () {
+        var orig = btn.textContent;
+        btn.textContent = btn.getAttribute('data-done');
+        btn.classList.add('done');
+        setTimeout(function () { btn.textContent = orig; btn.classList.remove('done'); }, 1800);
+      };
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(text).then(done).catch(function () { fallback(); });
+      } else { fallback(); }
+      function fallback() {
+        var ta = document.createElement('textarea');
+        ta.value = text; document.body.appendChild(ta); ta.select();
+        try { document.execCommand('copy'); done(); } catch (e) {}
+        document.body.removeChild(ta);
+      }
+    });
+  });
+</script>
+</body>
+</html>
