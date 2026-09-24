@@ -45,6 +45,7 @@ Launch two subagents in parallel:
 Then:
 
 - **Test planner** (use the `test-planner` skill): behavior test cases per checkpoint → `.jam/test-plan.md`.
+- **Touch-it-early ordering (MANDATORY).** When the deliverable can be made visible or tangible — a UI, a page, a report, a working slice of the thing — the checkpoint plan MUST front-load it: checkpoint 1 or 2 produces something the human can open, click, and react to. Never build the whole thing behind closed doors and reveal it at the end. The human's eyes on a real, touchable thing early is the highest-value feedback in this method, and it is what makes mid-build redirection possible. If nothing can be made tangible (pure backend/logic work), say so in the plan summary and why.
 - Set `phase: execution` in STATE.json. Commit: `jam(planning): checkpoint plan + test plan`.
 
 ## 3. Human Input #1 — plan approval (MANDATORY STOP)
@@ -85,6 +86,20 @@ Present: what was built, test results, UI summary, reviewer verdicts. Approval �
 When all checkpoints are done, run a **drift check**: re-derive what was built and diff it against `.jam/PRODUCT.md` requirements. Discrepancies become new checkpoints through the full loop. Then hand the human the running feature. Their feedback → `learnings.md` + new checkpoints as needed.
 
 Set `phase: complete` only when every checkpoint is done, every requirement is covered by done-checkpoint evidence, and `jam.py check` is clean.
+
+## 6. Redirect — feedback, new features, direction changes (any time)
+
+The human will react to touchable builds — "change this," "add that," "actually, let's go a different direction." This can arrive mid-loop, at final review, or after completion. It is a first-class event, not an interruption. When it happens:
+
+1. **Stop the loop.** Do not keep building on stale intent. Mark the current checkpoint `blocked` (reason: awaiting redirect) if work is mid-flight.
+2. **Ask focused questions about the delta only.** What exactly should be different? What should stay? Never re-run full discovery — the accepted product is the baseline, and only the change needs questioning.
+3. **Update `.jam/PRODUCT.md`.** Add new FR/QR IDs for new scope; amend IDs whose meaning changed (never recycle an ID for a different meaning — supersede it and point at the replacement); mark dead requirements superseded with a pointer to what replaced them.
+4. **Append `.jam/DECISIONS.md`.** What changed, why, and what was rejected — future agents must understand the turn, not just the new destination.
+5. **Re-plan.** In STATE.json: mark affected checkpoints `superseded` (terminal — the enforcer will not demand gates or evidence for them); add/reorder new checkpoints with requirement IDs and verify commands; update the test plan for changed scope.
+6. **Human Input — revised plan approval (MANDATORY STOP).** Present the revised sequence (what's new, what's superseded, what continues unchanged). Wait for approval.
+7. **Resume.** Update `.jam/RESUME.md`, commit `jam(redirect): <what changed>`, and re-enter the build loop at the new current checkpoint.
+
+The human never needs to know these mechanics — they just say what they want different, and the method absorbs it without losing the record of what came before.
 
 ## Operating rules
 
