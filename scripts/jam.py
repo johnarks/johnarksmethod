@@ -25,7 +25,7 @@ import sys
 METHOD = "johnarksmethod"
 METHOD_VERSION = "1.0"
 
-VALID_STATUS = {"planned", "in_progress", "done"}
+VALID_STATUS = {"planned", "in_progress", "done", "blocked", "superseded"}
 VALID_GATES = {"pending", "passed", "skipped", "failed"}
 GATE_NAMES = ("behavior", "ui", "adversarial", "human", "audit")
 VALID_PHASES = {"discovery", "planning", "execution", "complete"}
